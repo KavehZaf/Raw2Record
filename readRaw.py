@@ -56,6 +56,8 @@ class Reader():
         (folder, file) = os.path.split(filepath)
         self.caseName = file[:-4]
         psspy.fnsl([1,2,0,0,1,0,0,0])
+        psspy.save('temp.sav') #save temporarily the solved case
+        psspy.case('temp.sav') #set the saved case as current case
 
         assert ierr == 0, 'Raw file cannot be opened'
 
