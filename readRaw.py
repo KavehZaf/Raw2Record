@@ -50,10 +50,12 @@ class Reader():
     def openRaw(self, filepath):
         '''
         Reads and opens a raw file
+        Runs a power flow for the current raw file
         '''
         ierr = psspy.readrawversion(0, '33.0', filepath)
         (folder, file) = os.path.split(filepath)
         self.caseName = file[:-4]
+        psspy.fnsl([1,2,0,0,1,0,0,0])
 
         assert ierr == 0, 'Raw file cannot be opened'
 
