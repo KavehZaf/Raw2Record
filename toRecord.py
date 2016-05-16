@@ -61,11 +61,11 @@ class Record():
             self.recordFile.write('// 2WindingTrafo %s\n' % (trafo))
             self.recordFile.write('   parameter Real t1_%s = %f; \n' % (trafo, self.trafos[trafo]['t1']))
             self.recordFile.write('   parameter Real t2_%s = %f; \n' % (trafo, self.trafos[trafo]['t2']))
-        self.recordFile.write(r'end Trafos;')
+        self.recordFile.write(r'end Trafos;\n')
 
     def closeRecord(self):
         self.recordFile.write('Voltages voltages;\n')
         self.recordFile.write('Machines machines;\n')
         self.recordFile.write('Loads loads;\n')
         self.recordFile.write('Trafos trafos;\n')
-        self.recordFile.write('end PF_results')
+        self.recordFile.write('end PF_results;')
