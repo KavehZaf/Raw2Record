@@ -7,32 +7,37 @@ import Raw2Record
 import readRaw
 import toRecord
 
-reader = readRaw.Reader(Raw2Record.settings.globalworkdir, r'X:/dev/N44_WP7/N44 Snapshots/N44_20150401/h0_after_PF.raw')
+reader = readRaw.Reader(Raw2Record.settings.globalworkdir, r'X:/dev/N44_WP7/01_PSSE_Resources/Snapshots/N44_20150101')
 
 lista = reader.getListOfRawFiles()
-reader.openRaw(lista[0])
+for snapshot in lista:
+    # Opening the current snapshot in PSS/E
+    reader.openRaw(snapshot)
+    # Reading all of the components from the PSS/E to reader object
+    reader.readBusNumbers()
 
-reader.readBusNumbers()
-reader.readVoltageLevels()
-reader.readVoltageAngles()
-buses = reader.createBusDict()
+    reader.readVoltageLevels()
+    reader.readVoltageAngles()
 
+    reader.readMachines()
+    reader.readMachinePowers()
 
-reader.readMachines()
-reader.readMachinePowers()
-machines = reader.createMachineDict()
+    reader.readLoads()
+    reader.readLoadPowers()
 
-reader.readLoads()
-reader.readLoadPowers()
-loads = reader.createLoadDict()
+    reader.readTrafos()
+    reader.readTrafoRatios()
 
-reader.readTrafos()
-reader.readTrafoRatios()
-trafos = reader.createTrafoDict()
+    # Creating the dictionaries for each of the components from the reader object
+    buses = reader.createBusDict()
+    machines = reader.createMachineDict()
+    loads = reader.createLoadDict()
+    trafos = reader.createTrafoDict()
 
-
-record = toRecord.Record(Raw2Record.settings.globalworkdir, reader.caseName, buses, machines, loads, trafos)
-record.writeVoltages()
-record.writeMachines()
-record.writeLoads()
-record.writeTrafos()
+    # Instantiating the record object and writing component dictionaries to the record file
+    record = toRecord.Record(Raw2Record.settings.globalworkdir, snapshot, reader.caseName, buses, machines, loads, trafos)
+    record.writeVoltages()
+    record.writeMachines()
+    record.writeLoads()
+    record.writeTrafos()
+    record.closeRecord()

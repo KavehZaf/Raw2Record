@@ -11,55 +11,61 @@ class Record():
     Class defining how Modelica record file is created
     '''
 
-    def __init__(self, workdir, caseName, buses, machines, loads, trafos):
+    def __init__(self, workdir, rawfilepath, caseName, buses, machines, loads, trafos):
         '''
         Constructor:
             - Store dictionary of buses
+            - Open a record file
+            - Write the beginning of the file
         '''
-        self.workdir = workdir
         self.buses = buses
         self.machines = machines
         self.loads = loads
         self.trafos = trafos
         self.caseName = caseName
-        assert(os.path.isdir(workdir))
+        assert(os.path.isfile(rawfilepath))
+        self.recordPath = workdir + '/' + rawfilepath.split('/')[-2]
+        if not os.access(self.recordPath, os.F_OK):
+            os.mkdir(self.recordPath)
+        self.recordFile = open(self.recordPath + r'/%s.mo' % (self.caseName), 'w+')
+        self.recordFile.write('record PF_results\n //Power flow results for the snapshot %s\n \n   extends Modelica.Icons.Record; \n' % (self.caseName))
+
 
     def writeVoltages(self):
-        file = open(self.workdir + r'/%s_Voltages.mo' % (self.caseName), 'w')
-        file.write('record %s_voltages\n   extends Modelica.Icons.Record;\n' % (self.caseName))
+        self.recordFile.write('record Voltages\n')
         for key in self.buses.keys():
-            file.write('// Bus number %s\n' % (key))
-            file.write('   parameter Real V%s = %f; \n' % (key, self.buses[key]['voltage']))
-            file.write('   parameter Real A%s = %f; \n' % (key, self.buses[key]['angle']))
-        file.write(r'end %s_voltages;' % (self.caseName))
-        file.close()
+            self.recordFile.write('// Bus number %s\n' % (key))
+            self.recordFile.write('   parameter Real V%s = %f; \n' % (key, self.buses[key]['voltage']))
+            self.recordFile.write('   parameter Real A%s = %f; \n' % (key, self.buses[key]['angle']))
+        self.recordFile.write('end Voltages;\n')
 
     def writeMachines(self):
-        file = open(self.workdir + r'/%s_Machines.mo' % (self.caseName), 'w')
-        file.write('record %s_machines\n   extends Modelica.Icons.Record;\n' % (self.caseName))
+        self.recordFile.write('record Machines\n')
         for machine in self.machines.keys():
-            file.write('// Machine %s\n' % (machine))
-            file.write('   parameter Real P%s = %f; \n' % (machine, self.machines[machine]['P']))
-            file.write('   parameter Real Q%s = %f; \n' % (machine, self.machines[machine]['Q']))
-        file.write(r'end %s_machines;' % (self.caseName))
-        file.close()
+            self.recordFile.write('// Machine %s\n' % (machine))
+            self.recordFile.write('   parameter Real P%s = %f; \n' % (machine, self.machines[machine]['P']))
+            self.recordFile.write('   parameter Real Q%s = %f; \n' % (machine, self.machines[machine]['Q']))
+        self.recordFile.write('end Machines;\n')
 
     def writeLoads(self):
-        file = open(self.workdir + r'/%s_Loads.mo' % (self.caseName), 'w')
-        file.write('record %s_loads\n   extends Modelica.Icons.Record;\n' % (self.caseName))
+        self.recordFile.write('record Loads\n')
         for load in self.loads.keys():
-            file.write('// Load %s\n' % (load))
-            file.write('   parameter Real PL%s = %f; \n' % (load, self.loads[load]['P']))
-            file.write('   parameter Real QL%s = %f; \n' % (load, self.loads[load]['Q']))
-        file.write(r'end %s_loads;' % (self.caseName))
-        file.close()
+            self.recordFile.write('// Load %s\n' % (load))
+            self.recordFile.write('   parameter Real PL%s = %f; \n' % (load, self.loads[load]['P']))
+            self.recordFile.write('   parameter Real QL%s = %f; \n' % (load, self.loads[load]['Q']))
+        self.recordFile.write('end Loads;\n')
 
     def writeTrafos(self):
-        file = open(self.workdir + r'/%s_Trafos.mo' % (self.caseName), 'w')
-        file.write('record %s_trafos\n   extends Modelica.Icons.Record;\n' % (self.caseName))
+        self.recordFile.write('record Trafos\n')
         for trafo in self.trafos.keys():
-            file.write('// 2WindingTrafo %s\n' % (trafo))
-            file.write('   parameter Real t1_%s = %f; \n' % (trafo, self.trafos[trafo]['t1']))
-            file.write('   parameter Real t2_%s = %f; \n' % (trafo, self.trafos[trafo]['t2']))
-        file.write(r'end %s_trafos;' % (self.caseName))
-        file.close()
+            self.recordFile.write('// 2WindingTrafo %s\n' % (trafo))
+            self.recordFile.write('   parameter Real t1_%s = %f; \n' % (trafo, self.trafos[trafo]['t1']))
+            self.recordFile.write('   parameter Real t2_%s = %f; \n' % (trafo, self.trafos[trafo]['t2']))
+        self.recordFile.write(r'end Trafos;')
+
+    def closeRecord(self):
+        self.recordFile.write('Voltages voltages;\n')
+        self.recordFile.write('Machines machines;\n')
+        self.recordFile.write('Loads loads;\n')
+        self.recordFile.write('Trafos trafos;\n')
+        self.recordFile.write('end PF_results')

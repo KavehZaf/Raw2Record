@@ -13,7 +13,7 @@ sys.path.append(os.environ["PSSEHOME"])
 os.environ['PATH'] += ';' + os.environ["PSSEHOME"]
 
 # Creating and moving to the working directory
-globalworkdir = 'C:/temp/Raw2Record_%s' % (datetime.date.today())
+globalworkdir = 'X:/dev/N44_WP7/03_Modelica/SmarTSLab/Snapshots'
 currpath = os.getcwd()
 # new directory
 if not os.access(globalworkdir, os.F_OK):

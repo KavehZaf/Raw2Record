@@ -5,3 +5,4 @@ author: trabuzin at gmail dot com
 
 import settings
 import readRaw
+import toRecord

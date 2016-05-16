@@ -41,7 +41,7 @@ class Reader():
             print self.raw_file_dir
             for i in os.listdir(self.raw_file_dir):
                 if i.endswith(".raw"):
-                    self.rawfilelist.append(i)
+                    self.rawfilelist.append(self.raw_file_dir+'/'+i)
 
         else:
             self.rawfilelist.append(self.raw_file_dir)
@@ -56,8 +56,6 @@ class Reader():
         (folder, file) = os.path.split(filepath)
         self.caseName = file[:-4]
         psspy.fnsl([1,2,0,0,1,0,0,0])
-        psspy.save('temp.sav') #save temporarily the solved case
-        psspy.case('temp.sav') #set the saved case as current case
 
         assert ierr == 0, 'Raw file cannot be opened'
 
