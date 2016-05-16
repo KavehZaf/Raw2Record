@@ -38,11 +38,10 @@ class Reader():
         Creates a list of available raw files
         '''
         if os.path.isdir(self.raw_file_dir):
-            print self.raw_file_dir
-            for i in os.listdir(self.raw_file_dir):
-                if i.endswith(".raw"):
-                    self.rawfilelist.append(self.raw_file_dir+'/'+i)
-
+            for root, dirs, files in os.walk(self.raw_file_dir):
+                for name in files:
+                    if name.endswith(".raw"):
+                        self.rawfilelist.append(os.path.join(root, name))
         else:
             self.rawfilelist.append(self.raw_file_dir)
         return self.rawfilelist
